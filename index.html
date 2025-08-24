@@ -1,60 +1,683 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cursed Web Arcade</title>
-<style>
-  body {
-    font-family: sans-serif;
-    background: linear-gradient(135deg, #111, #333);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  h1 {
-    margin-bottom: 20px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    width: 100%;
-    max-width: 1000px;
-  }
-  a {
-    display: block;
-    padding: 20px;
-    background: #222;
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    transition: 0.2s;
-  }
-  a:hover {
-    background: #444;
-    transform: scale(1.05);
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>😈 Cursed Web Arcade — 50 Micro Games</title>
+  <style>
+    :root{
+      --bg1:#0f0f10;--bg2:#1c1c22;--card:#1a1b25;--accent:#ff7675;--text:#eaeaf0;--muted:#a9a9b8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      background: radial-gradient(1000px 600px at 20% 10%, #1f1f2a, transparent),
+                  radial-gradient(800px 500px at 80% 90%, #202030, transparent),
+                  linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      display:flex;flex-direction:column;align-items:center;gap:20px;padding:24px;
+    }
+    h1{margin:0;font-size:clamp(24px,3vw,40px);letter-spacing:.5px}
+    .muted{color:var(--muted)}
+
+    .shell{width:min(1200px,95vw)}
+    .menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:12px}
+    .card{background:var(--card);border:1px solid #2a2b3a;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+    .tile{cursor:pointer;transition:transform .12s ease, background .2s ease, border-color .2s ease;user-select:none}
+    .tile:hover{transform:translateY(-3px);border-color:#3a3b4a;background:#202233}
+    .tile h3{margin:0 0 6px 0;font-size:16px}
+    .tile p{margin:0;font-size:12px;color:var(--muted)}
+
+    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:8px}
+    .btn{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(255,118,117,.25);}
+    .btn.secondary{background:#2b2c3c;color:var(--text);box-shadow:none;border:1px solid #3a3b4a}
+    .btn:active{transform:translateY(1px)}
+
+    .stage{margin-top:18px;min-height:520px;border:1px dashed #3a3b4a;border-radius:18px;padding:18px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .stage-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+
+    .hud{position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .badge{background:#2b2c3c;color:var(--text);border:1px solid #3a3b4a;border-radius:999px;padding:6px 10px;font-size:12px}
+
+    .center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+    .big{font-size:clamp(22px,2.5vw,32px)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .pad{padding:14px 18px;border-radius:12px}
+
+    /* tiny components reused by games */
+    .pill{padding:8px 12px;border-radius:999px;border:1px solid #3a3b4a;background:#232433}
+    .input{padding:10px 12px;border-radius:10px;border:1px solid #3a3b4a;background:#181926;color:var(--text)}
+    .progress{width:min(520px,80%);height:18px;border-radius:20px;background:#222436;border:1px solid #33364a;overflow:hidden}
+    .progress>div{height:100%;background:var(--accent);width:0}
+
+    /* game specific helpers */
+    .arena{position:relative;width:min(800px,95%);height:min(480px,68vh);border:1px solid #3a3b4a;border-radius:14px;background:#141521;overflow:hidden}
+    .dot{position:absolute;width:26px;height:26px;border-radius:50%;background:#00d4ff;display:grid;place-items:center;font-weight:900;color:#001018}
+    .enemy{background:#ff5577}
+    .target{background:#88ff55}
+    .shake{animation:shake .2s linear 1}
+    @keyframes shake{0%{transform:translate(1px,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-2px)}100%{transform:translate(0,0)}}
+  </style>
 </head>
 <body>
-  <h1>😈 Cursed Web Arcade 😈</h1>
-  <div class="grid">
-    <a href="game1.html">Runaway Button</a>
-    <a href="game2.html">Mouse Stalker</a>
-    <a href="game3.html">Eternal Loading Bar</a>
-    <a href="game4.html">Snack Oracle</a>
-    <a href="game5.html">Random Screamer Text</a>
-    <a href="game6.html">Reverse Typing Box</a>
-    <a href="game7.html">Cat Bounce (Cursed)</a>
-    <a href="game8.html">Infinite Yes/No</a>
-    <a href="game9.html">Pixel Reveal</a>
-    <a href="game10.html">Fake Virus Alert</a>
-    <!-- keep adding until game50.html -->
+  <div class="shell">
+    <h1>😈 Cursed Web Arcade</h1>
+    <div class="topbar">
+      <div class="muted">50 tiny chaotic games. Click any tile to load it below. Press <span class="mono">Esc</span> to return.</div>
+      <div class="row">
+        <button class="btn" id="randomBtn">Random Game 🎲</button>
+        <button class="btn secondary" id="backBtn" title="Back to menu">Menu</button>
+      </div>
+    </div>
+
+    <div id="menu" class="menu"></div>
+
+    <div class="stage" id="stage" aria-live="polite">
+      <div class="stage-content center">
+        <div class="card center" style="padding:32px;max-width:660px">
+          <div class="big">Pick a game from the grid above 👆</div>
+          <p class="muted">Everything runs client‑side, no servers, just vibes.</p>
+        </div>
+      </div>
+      <div class="hud" id="hud"></div>
+    </div>
   </div>
+
+  <script>
+  // ---------- Utility helpers ----------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; };
+  const clamp = (v, a, b)=> Math.max(a, Math.min(b, v));
+
+  function clearStage(){ const stage = $('#stage'); const sc = $('.stage-content', stage); sc.innerHTML=''; $('#hud').innerHTML=''; stage.classList.remove('shake'); return sc; }
+  function backToMenu(){ clearStage(); window.location.hash=''; }
+  function setHUD(...badges){ const hud=$('#hud'); hud.innerHTML=''; badges.forEach(b=>hud.appendChild(el('div','badge',b))); }
+  function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function rand(a,b){ return Math.random()*(b-a)+a; }
+
+  // ---------- Game registry ----------
+  const games = [];
+  const addGame = (id, name, desc, init) => games.push({id, name, desc, init});
+
+  // 1. Runaway Button
+  addGame('game1','Runaway Button','Try clicking it. Good luck.', (stage)=>{
+    setHUD('Mouse','Reflex');
+    const btn = el('button','btn','Catch me!');
+    btn.style.position='absolute';
+    btn.style.left='40%'; btn.style.top='40%';
+    const area = el('div','arena');
+    area.appendChild(btn);
+    stage.append(area);
+    const move = ()=>{
+      const x = clamp(Math.random()* (area.clientWidth-120), 10, area.clientWidth-130);
+      const y = clamp(Math.random()* (area.clientHeight-50), 10, area.clientHeight-60);
+      btn.style.left=x+'px'; btn.style.top=y+'px';
+    };
+    btn.addEventListener('mouseover', move);
+    btn.addEventListener('click', ()=>{ btn.innerHTML='Impossible?!'; area.classList.add('shake'); setTimeout(()=>area.classList.remove('shake'),200)});
+  });
+
+  // 2. Mouse Stalker
+  addGame('game2','Mouse Stalker','The eyes follow your soul.', (stage)=>{
+    setHUD('Mouse');
+    const wrap = el('div','center',`<div class="row"><div class="card" style="padding:22px">Move your mouse… 👀</div></div>`);
+    const eye = el('div','',`<div style="width:120px;height:120px;background:white;border-radius:50%;display:grid;place-items:center;">`+
+      `<div id="pup" style="width:44px;height:44px;border-radius:50%;background:black;"></div></div>`);
+    wrap.append(eye); stage.append(wrap);
+    const pup = $('#pup',wrap);
+    document.onmousemove = (e)=>{
+      const x = (e.clientX/window.innerWidth*60)-30;
+      const y = (e.clientY/window.innerHeight*60)-30;
+      pup.style.transform=`translate(${x}px,${y}px)`;
+    };
+  });
+
+  // 3. Eternal Loading Bar
+  addGame('game3','Eternal Loading','It never finishes.', (stage)=>{
+    setHUD('Idle','Patience');
+    const bar = el('div','progress');
+    const fill = el('div'); bar.append(fill);
+    stage.append(el('div','center','<div class="big">Loading…</div>')); stage.append(bar);
+    let p=0; setInterval(()=>{ p+=Math.random()*22; if(p>100) p=0; fill.style.width=p+'%'; }, 500);
+  });
+
+  // 4. Snack Oracle (with roll)
+  addGame('game4','Snack Oracle','What should you eat next?', (stage)=>{
+    setHUD('RNG');
+    const snacks = ["Chips & salsa","PB on a spoon","Grilled cheese","Instant ramen","Cheese cubes","Nutella bread","Oreos & milk","Popcorn","Pickles","Leftover pizza","Fruit salad","Chocolate bar","Cereal any time","Ice cream tub","Hot pockets","Nachos","Trail mix","Banana + PB","Avocado toast","Fries","Onion rings","Donut","Bagel + cream cheese","Hummus + pita","Jerky","Cup noodles","Taco","Burrito","Fried rice","Sushi","Spring rolls","Mozz sticks","Quesadilla","Pretzel","Cookie","Brownie","Cupcake","Muffin","Croissant","Apple","Orange","Grapes","Strawberries","Blueberries","Pineapple","Watermelon","Cherries","Kiwi","Mango","Carrot sticks","Celery + PB","Cucumber","Yogurt parfait","Crackers","Pocky","Rice krispie","Mac & cheese","Tater tots","Pizza rolls","Bagel bites","Corn dog","Waffles","Pancakes","Chicken nuggets","Hash browns","Spinach dip","Queso"];
+    const btn = el('button','btn','Roll Snack');
+    const out = el('div','pill big','—');
+    stage.append(el('div','center','<div class="big">Snack Randomizer 🍿</div>'));
+    stage.append(btn); stage.append(el('div','pad')); stage.append(out);
+    btn.onclick=()=>{
+      let c=0; out.textContent='Rolling…'; const t = setInterval(()=>{ out.textContent=choice(snacks); c++; if(c>12){clearInterval(t); out.textContent='👉 '+choice(snacks);} },90);
+    };
+  });
+
+  // 5. Reverse Typing Box
+  addGame('game5','Reverse Typing','Everything you type flips.', (stage)=>{
+    setHUD('Keyboard','Chaos');
+    const input = el('input','input'); input.placeholder='Type here…'; input.style.minWidth='320px';
+    const out = el('div','pill mono',''); out.style.minWidth='320px'; out.style.marginTop='8px';
+    stage.append(el('div','center','<div class="big">reverse(typing)</div>'));
+    stage.append(input); stage.append(out);
+    input.oninput=()=>{ out.textContent = input.value.split('').reverse().join(''); };
+  });
+
+  // 6. Infinite Yes/No
+  addGame('game6','Infinite Yes/No','Are you sure? (forever)', (stage)=>{
+    setHUD('Endless');
+    const q = el('div','big','Are you sure?');
+    const row = el('div','row');
+    const y = el('button','btn','Yes'); const n = el('button','btn secondary','No');
+    row.append(y,n); stage.append(el('div','center','')); stage.firstChild.append(q,row);
+    const next=()=>{ q.textContent = choice(['Are you sure?','Really?','Final answer?','Double sure?','Hmm?','You hesitate. Why?']); };
+    y.onclick=n.onclick=next; next();
+  });
+
+  // 7. Random Screamer Text (not loud, just visual)
+  addGame('game7','Screamer Text','Big random words flash.', (stage)=>{
+    setHUD('Flash');
+    const words = ['SPAGHETTI','OBLIVION','BANANA','ERROR','CHAOS','CHEESE','POTATO','HACKED','GLORP','BEEP'];
+    const box = el('div','big mono',''); box.style.fontSize='64px';
+    stage.append(el('div','center','')); stage.firstChild.appendChild(box);
+    setInterval(()=>{ box.textContent = choice(words); box.parentElement.classList.add('shake'); setTimeout(()=>box.parentElement.classList.remove('shake'),180); }, 1200);
+  });
+
+  // 8. Pixel Reveal (1px at a time)
+  addGame('game8','Pixel Reveal','Image appears… slowly.', (stage)=>{
+    setHUD('Patience');
+    const cvs = el('canvas'); cvs.width=320; cvs.height=240; cvs.style.border='1px solid #33364a';
+    stage.append(el('div','center','<div class="big">Pixel by Pixel</div>')); stage.append(cvs);
+    const ctx=cvs.getContext('2d'); const img = new Image();
+    // tiny embedded image (data URL 16x16 pattern)
+    img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48"><rect width="100%" height="100%" fill="%23022"/><circle cx="32" cy="24" r="18" fill="%23ff7675"/></svg>';
+    img.onload=()=>{
+      let x=0,y=0; const step=()=>{
+        ctx.drawImage(img, Math.floor(Math.random()*img.width), Math.floor(Math.random()*img.height),1,1, Math.floor(Math.random()*cvs.width), Math.floor(Math.random()*cvs.height),1,1);
+        if((x++)<cvs.width*cvs.height) requestAnimationFrame(step);
+      }; step();
+    };
+  });
+
+  // 9. Fake Virus Alert (visual only)
+  addGame('game9','Fake Alert','Harmless fake alert spam.', (stage)=>{
+    setHUD('Popup Hell');
+    const arena = el('div','arena'); stage.append(arena);
+    const msgs=['Critical Error','System Breach','Kernel Panic','Blue Screen 0xDEAD','Call Mom','Snack Required'];
+    setInterval(()=>{
+      const a = el('div','card',`<b>${choice(msgs)}</b><br><span class="muted">Click to dismiss</span>`);
+      a.style.position='absolute'; a.style.left=rand(10, arena.clientWidth-160)+'px'; a.style.top=rand(10, arena.clientHeight-110)+'px'; a.style.width='150px'; a.style.padding='10px';
+      arena.append(a); a.onclick=()=>a.remove();
+    }, 700);
+  });
+
+  // 10. Clicker (reach 50)
+  addGame('game10','Clicker 50','Click to 50 as fast as possible.', (stage)=>{
+    setHUD('Click Speed');
+    let n=0; const btn=el('button','btn','Click me (0)'); const start=Date.now();
+    stage.append(el('div','center','')); stage.firstChild.append(btn);
+    btn.onclick=()=>{ n++; btn.textContent=`Click me (${n})`; if(n>=50){ btn.disabled=true; const t=((Date.now()-start)/1000).toFixed(2); stage.append(el('div','pill',`Time: ${t}s`)); }}
+  });
+
+  // 11. Reaction Time
+  addGame('game11','Reaction Test','Wait for green, then click.', (stage)=>{
+    setHUD('Reflex');
+    const box = el('div','card center','<div class="big">Wait…</div>'); box.style.padding='40px';
+    stage.append(box); let armed=false; let started=false; let t0=0;
+    const go=()=>{ box.style.background='#204a20'; box.firstChild.textContent='CLICK!'; armed=true; t0=performance.now(); };
+    const cue = setTimeout(go, 1000+Math.random()*2500);
+    box.onclick=()=>{ if(!started) started=true; if(armed){ const rt=(performance.now()-t0).toFixed(0); box.innerHTML=`<div class="big">${rt} ms</div><div class="muted">Refresh to try again</div>`; clearTimeout(cue); } else { box.innerHTML='<div class="big">Too soon!</div>'; }
+    };
+  });
+
+  // 12. Aim Trainer (10 targets)
+  addGame('game12','Aim Trainer','Hit 10 targets quickly.', (stage)=>{
+    setHUD('Mouse Aim');
+    const arena=el('div','arena'); stage.append(arena);
+    let hits=0; let start=Date.now();
+    const spawn=()=>{
+      const t=el('div','dot target'); t.textContent='';
+      t.style.left=rand(10, arena.clientWidth-40)+'px'; t.style.top=rand(10, arena.clientHeight-40)+'px';
+      t.onclick=()=>{ t.remove(); hits++; if(hits>=10){ const time=((Date.now()-start)/1000).toFixed(2); arena.innerHTML=`<div class="center" style="width:100%"><div class="big">Done in ${time}s</div></div>`; } else spawn(); };
+      arena.append(t);
+    }; spawn();
+  });
+
+  // 13. Dodge Box (arrow keys)
+  addGame('game13','Dodge Box','Don\'t touch the enemy.', (stage)=>{
+    setHUD('Arrows','Survival 15s');
+    const arena=el('div','arena'); stage.append(arena);
+    const you=el('div','dot',''); const foe=el('div','dot enemy',''); arena.append(you,foe);
+    let x=40,y=40,fx=200,fy=120; const sp=6; const keys={};
+    addEventListener('keydown',e=>keys[e.key]=true); addEventListener('keyup',e=>keys[e.key]=false);
+    const t0=Date.now();
+    function loop(){
+      if(keys['ArrowLeft']) x-=sp; if(keys['ArrowRight']) x+=sp; if(keys['ArrowUp']) y-=sp; if(keys['ArrowDown']) y+=sp;
+      x=clamp(x,0,arena.clientWidth-26); y=clamp(y,0,arena.clientHeight-26);
+      you.style.left=x+'px'; you.style.top=y+'px';
+      // foe chases you
+      fx+= (x-fx)*0.02; fy+= (y-fy)*0.02; foe.style.left=fx+'px'; foe.style.top=fy+'px';
+      const dx=x-fx, dy=y-fy; if(Math.hypot(dx,dy)<26){ arena.classList.add('shake'); arena.innerHTML='<div class="center" style="width:100%"><div class="big">💥 Caught!</div></div>'; return; }
+      if(Date.now()-t0>15000){ arena.innerHTML='<div class="center" style="width:100%"><div class="big">🏆 You survived!</div></div>'; return; }
+      requestAnimationFrame(loop);
+    } loop();
+  });
+
+  // 14. Number Guess (1-100)
+  addGame('game14','Number Guess','Find the secret number.', (stage)=>{
+    setHUD('Logic');
+    const target = 1+Math.floor(Math.random()*100);
+    const input = el('input','input'); input.type='number'; input.placeholder='1-100';
+    const out = el('div','pill'); const btn=el('button','btn','Guess');
+    const row=el('div','row'); row.append(input,btn); stage.append(el('div','center','')); stage.firstChild.append(row,out);
+    btn.onclick=()=>{
+      const v=parseInt(input.value,10);
+      if(isNaN(v)) return out.textContent='Enter a number.';
+      out.textContent = v===target ? '🎯 Correct!' : (v<target? 'Higher…':'Lower…');
+    };
+  });
+
+  // 15. Coin Flip Streak
+  addGame('game15','Coin Streak','How many heads in a row?', (stage)=>{
+    setHUD('RNG');
+    let streak=0,maxs=0; const btn=el('button','btn','Flip'); const out=el('div','pill mono','');
+    btn.onclick=()=>{ const h=Math.random()<0.5; if(h){ streak++; } else { streak=0; } maxs=Math.max(maxs,streak); out.textContent=`${h?'Heads':'Tails'} | Streak ${streak} (max ${maxs})`; };
+    stage.append(el('div','center','')); stage.firstChild.append(btn,out);
+  });
+
+  // 16. Dice Race (to 30)
+  addGame('game16','Dice Race','Reach 30 before bot.', (stage)=>{
+    setHUD('Turn-based');
+    let you=0, bot=0; const out=el('div','mono big','0 - 0'); const btn=el('button','btn','Roll');
+    btn.onclick=()=>{ you+=1+Math.floor(Math.random()*6); bot+=1+Math.floor(Math.random()*6); out.textContent=`You ${you}  |  Bot ${bot}`; if(you>=30||bot>=30){ btn.disabled=true; out.textContent += you>=30 && you>=bot ? '  — You win!' : '  — Bot wins!'; }};
+    stage.append(el('div','center','')); stage.firstChild.append(out,btn);
+  });
+
+  // 17. Whack-a-Mole (lite)
+  addGame('game17','Whack-a-Mole','Click appearing moles.', (stage)=>{
+    setHUD('Aim');
+    const arena=el('div','arena'); stage.append(arena);
+    let score=0; const s=el('div','badge','Score 0'); $('#hud').appendChild(s);
+    setInterval(()=>{
+      const m=el('div','dot',''); m.style.left=rand(10, arena.clientWidth-40)+'px'; m.style.top=rand(10, arena.clientHeight-40)+'px';
+      arena.append(m); const ttl=setTimeout(()=>m.remove(),800); m.onclick=()=>{ clearTimeout(ttl); m.remove(); score++; s.textContent='Score '+score; };
+    }, 400);
+  });
+
+  // 18. Type Sprint (word appears, type it)
+  addGame('game18','Type Sprint','Type 10 words fast.', (stage)=>{
+    setHUD('Keyboard');
+    const words=['glorp','banana','crypto','omelet','wizard','chaos','vector','pickle','socket','potion'];
+    let idx=0; let start=Date.now();
+    const show=()=>{ text.textContent=words[idx]; input.value=''; input.focus(); };
+    const text=el('div','big mono',''); const input=el('input','input'); input.placeholder='type here'; input.autocapitalize='off'; input.spellcheck=false;
+    stage.append(el('div','center','')); stage.firstChild.append(text,input);
+    input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ if(input.value.trim()===words[idx]){ idx++; if(idx>=words.length){ const t=((Date.now()-start)/1000).toFixed(2); stage.firstChild.innerHTML=`<div class="big">Done in ${t}s</div>`; } else show(); } }});
+    show();
+  });
+
+  // 19. Memory (2x4)
+  addGame('game19','Memory 2x4','Find matching pairs.', (stage)=>{
+    setHUD('Memory');
+    const emojis = ['🍕','🧀','🍩','🍟'];
+    const deck=[...emojis,...emojis].sort(()=>Math.random()-0.5);
+    const grid=el('div','', ''); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(4,80px)'; grid.style.gap='10px';
+    stage.append(el('div','center','')); stage.firstChild.append(grid);
+    let first=null, lock=false, found=0;
+    deck.forEach(sym=>{
+      const cell=el('button','pill', '❓'); cell.style.fontSize='28px'; cell.style.height='80px';
+      cell.onclick=()=>{
+        if(lock || cell.dataset.open==='1') return;
+        cell.textContent=sym; cell.dataset.open='1';
+        if(!first){ first=cell; } else {
+          lock=true;
+          setTimeout(()=>{
+            if(first.textContent===cell.textContent){ first.style.opacity=cell.style.opacity='0.4'; found+=2; if(found===deck.length) grid.insertAdjacentHTML('afterend','<div class="big">🏆 Cleared!</div>'); }
+            else { first.dataset.open=cell.dataset.open='0'; first.textContent=cell.textContent='❓'; }
+            first=null; lock=false;
+          }, 600);
+        }
+      };
+      grid.append(cell);
+    });
+  });
+
+  // 20. Hot/Cold Finder
+  addGame('game20','Hot / Cold','Find the hidden spot.', (stage)=>{
+    setHUD('Mouse Hunt');
+    const arena=el('div','arena'); stage.append(arena);
+    const target={x:rand(40,arena.clientWidth-40), y:rand(40,arena.clientHeight-40)};
+    const tip=el('div','badge','Move mouse'); $('#hud').append(tip);
+    arena.addEventListener('mousemove',e=>{
+      const r=arena.getBoundingClientRect(); const dx=e.clientX-r.left-target.x, dy=e.clientY-r.top-target.y; const d=Math.hypot(dx,dy);
+      tip.textContent = d<40? 'HOT 🔥' : d<120? 'Warm' : d<240? 'Cool' : 'Cold';
+    });
+    arena.addEventListener('click',e=>{
+      const r=arena.getBoundingClientRect(); const dx=e.clientX-r.left-target.x, dy=e.clientY-r.top-target.y;
+      if(Math.hypot(dx,dy)<30){ arena.innerHTML='<div class="center" style="width:100%"><div class="big">🎯 Found!</div></div>'; }
+    });
+  });
+
+  // 21. Avoid the Walls (mouse trail)
+  addGame('game21','Avoid Walls','Keep inside the path.', (stage)=>{
+    setHUD('Steady Hand');
+    const arena=el('div','arena'); stage.append(arena);
+    const path=el('div','', ''); path.style.position='absolute'; path.style.left='20%'; path.style.top='10%'; path.style.width='60%'; path.style.height='80%'; path.style.border='40px solid #2a2b3a'; path.style.borderTopWidth='60px'; path.style.borderBottomWidth='60px'; arena.append(path);
+    const dot=el('div','dot',''); dot.style.left='24%'; dot.style.top='12%'; arena.append(dot);
+    let lost=false;
+    arena.addEventListener('mousemove',e=>{
+      const r=path.getBoundingClientRect(); const inside=e.clientX>r.left && e.clientX<r.right && e.clientY>r.top && e.clientY<r.bottom;
+      if(!inside && !lost){ lost=true; arena.classList.add('shake'); arena.insertAdjacentHTML('beforeend','<div class="center" style="width:100%;height:100%"><div class="big">💥 You touched the wall!</div></div>'); }
+    });
+  });
+
+  // 22. Auto Type Spoofer
+  addGame('game22','Auto Typer','The box types itself.', (stage)=>{
+    setHUD('Weird');
+    const input=el('input','input'); const btn=el('button','btn','Start'); const txt='i am not typing this';
+    stage.append(el('div','center','')); stage.firstChild.append(input, btn);
+    btn.onclick=()=>{ input.value=''; let i=0; const t=setInterval(()=>{ input.value+=txt[i++]; if(i>=txt.length) clearInterval(t); },60); };
+  });
+
+  // 23. Gravity Drop (click to spawn)
+  addGame('game23','Gravity Drop','Spawn falling boxes.', (stage)=>{
+    setHUD('Toy');
+    const arena=el('div','arena'); stage.append(arena);
+    arena.addEventListener('click',e=>{
+      const r=arena.getBoundingClientRect(); const b=el('div','', ''); b.style.position='absolute'; b.style.width=b.style.height='22px'; b.style.left=(e.clientX-r.left-11)+'px'; b.style.top='0px'; b.style.background='#55e'; arena.append(b);
+      let y=0, vy=0; const loop=()=>{ vy+=0.6; y+=vy; if(y>arena.clientHeight-22){ y=arena.clientHeight-22; vy*=-0.55; } b.style.top=y+'px'; if(Math.abs(vy)>0.3 || y<arena.clientHeight-22) requestAnimationFrame(loop); }; loop();
+    });
+  });
+
+  // 24. RGB Guess
+  addGame('game24','RGB Guess','Pick the color that matches.', (stage)=>{
+    setHUD('Perception');
+    const goal=[Math.floor(rand(0,255)),Math.floor(rand(0,255)),Math.floor(rand(0,255))];
+    const sw=el('div','row');
+    for(let i=0;i<6;i++){
+      const c=[goal[0]+Math.floor(rand(-40,40)),goal[1]+Math.floor(rand(-40,40)),goal[2]+Math.floor(rand(-40,40))].map(v=>clamp(v,0,255));
+      const b=el('button','pad'); b.style.background=`rgb(${c[0]},${c[1]},${c[2]})`; b.textContent=' ';
+      b.onclick=()=>{ if(b.style.background.includes(`rgb(${goal[0]}, ${goal[1]}, ${goal[2]})`)){ sw.insertAdjacentHTML('afterend','<div class="big">🎯 Nice eye!</div>'); } else { sw.insertAdjacentHTML('afterend','<div class="big">❌ Nope</div>'); }
+      };
+      sw.append(b);
+    }
+    stage.append(el('div','center',`<div class="big mono">rgb(${goal.join(',')})</div>`)); stage.append(sw);
+  });
+
+  // 25. Endless Progress Maze (bars reset)
+  addGame('game25','Progress Maze','Three bars, none finish.', (stage)=>{
+    setHUD('Troll');
+    const wrap=el('div','center',''); const mk=()=>{ const p=el('div','progress'); const f=el('div'); p.append(f); return [p,f]; };
+    const [p1,f1]=mk(), [p2,f2]=mk(), [p3,f3]=mk();
+    wrap.append(p1,p2,p3); stage.append(wrap);
+    const tick=(f)=>{ let v=0; setInterval(()=>{ v+=rand(5,20); if(v>100) v=0; f.style.width=v+'%'; }, 400); };
+    [f1,f2,f3].forEach(tick);
+  });
+
+  // 26. RPS vs Bot
+  addGame('game26','Rock Paper Scissors','Beat the bot.', (stage)=>{
+    setHUD('RNG');
+    const row=el('div','row'); ['🪨','📄','✂️'].forEach(sym=>{ const b=el('button','btn',sym); b.onclick=()=>play(sym); row.append(b); });
+    const out=el('div','big',''); stage.append(el('div','center','')); stage.firstChild.append(row,out);
+    const wins={ '🪨': '✂️', '📄':'🪨', '✂️':'📄' };
+    function play(m){ const bot=choice(['🪨','📄','✂️']); out.textContent=`You ${m} vs ${bot} — ` + (m===bot?'Draw': wins[m]===bot?'Win!':'Lose'); }
+  });
+
+  // 27. Bubble Pop
+  addGame('game27','Bubble Pop','Pop 20 bubbles.', (stage)=>{
+    setHUD('Aim');
+    const arena=el('div','arena'); stage.append(arena);
+    let popped=0; const s=el('div','badge','0/20'); $('#hud').append(s);
+    const spawn=()=>{
+      const b=el('div','dot'); b.style.width=b.style.height='20px'; b.style.left=rand(0,arena.clientWidth-20)+'px'; b.style.top=arena.clientHeight+'px'; arena.append(b);
+      let y=arena.clientHeight; const speed=rand(1,2.5);
+      function loop(){ y-=speed; b.style.top=y+'px'; if(y<-20) { b.remove(); return; } requestAnimationFrame(loop); } loop();
+      b.onclick=()=>{ b.remove(); popped++; s.textContent=popped+'/20'; if(popped>=20) arena.innerHTML='<div class="center" style="width:100%"><div class="big">🎉 You did it!</div></div>'; };
+    };
+    for(let i=0;i<60;i++) setTimeout(spawn, i*200);
+  });
+
+  // 28. 1-Button Flappy Dot
+  addGame('game28','Flappy Dot','Space to stay afloat.', (stage)=>{
+    setHUD('Spacebar');
+    const arena=el('div','arena'); stage.append(arena);
+    const dot=el('div','dot'); dot.style.left='80px'; dot.style.top='120px'; arena.append(dot);
+    let y=120, vy=0; const pipes=[]; let alive=true; let t=0;
+    onkeydown=(e)=>{ if(e.code==='Space') vy=-7; };
+    function loop(){ if(!alive) return; t++; vy+=0.5; y+=vy; dot.style.top=y+'px'; if(y<0||y>arena.clientHeight-26){ alive=false; arena.innerHTML='<div class="center" style="width:100%"><div class="big">💥 Ouch</div></div>'; return; }
+      if(t%90===0){ const gap=120; const gy=rand(60, arena.clientHeight-60-gap); const top=el('div','', ''), bot=el('div','', ''); [top,bot].forEach(p=>{p.style.position='absolute'; p.style.width='40px'; p.style.background='#2b2c3c';}); top.style.height=gy+'px'; top.style.left=arena.clientWidth+'px'; top.style.top='0'; bot.style.top=(gy+gap)+'px'; bot.style.height=(arena.clientHeight-gy-gap)+'px'; bot.style.left=arena.clientWidth+'px'; arena.append(top,bot); pipes.push(top,bot); }
+      pipes.forEach(p=>{ p.style.left=(parseFloat(p.style.left)-2)+'px'; const r=p.getBoundingClientRect(), d=dot.getBoundingClientRect(), a=$('.arena').getBoundingClientRect(); if(!(d.right<a.left||d.left>r.right||d.bottom<r.top||d.top>r.bottom)) { alive=false; arena.innerHTML='<div class="center" style="width:100%"><div class="big">💥 Crash</div></div>'; }});
+      requestAnimationFrame(loop);
+    } loop();
+  });
+
+  // 29. Speed Math
+  addGame('game29','Speed Math','Solve 10 quick sums.', (stage)=>{
+    setHUD('Math');
+    let i=0, start=Date.now(); const q=el('div','big',''); const input=el('input','input'); const btn=el('button','btn','OK');
+    function next(){ a=1+Math.floor(rand(1,19)); b=1+Math.floor(rand(1,19)); ans=a+b; q.textContent=`${a} + ${b} = ?`; input.value=''; input.focus(); }
+    stage.append(el('div','center','')); stage.firstChild.append(q,input,btn);
+    btn.onclick=()=>{ if(parseInt(input.value,10)===ans){ i++; if(i>=10){ const t=((Date.now()-start)/1000).toFixed(2); q.textContent='Done in '+t+'s'; input.remove(); btn.remove(); } else next(); } };
+    let a,b,ans; next();
+  });
+
+  // 30. Anagram Scramble
+  addGame('game30','Anagram','Unscramble the word.', (stage)=>{
+    setHUD('Word');
+    const words=['planet','candle','memory','vector','pickle','wizard']; const base=choice(words);
+    const scr=base.split('').sort(()=>Math.random()-0.5).join('');
+    const q=el('div','big mono',scr); const input=el('input','input'); const btn=el('button','btn','Guess'); const out=el('div','pill');
+    stage.append(el('div','center','')); stage.firstChild.append(q,input,btn,out);
+    btn.onclick=()=>{ out.textContent = input.value.toLowerCase()===base? '🎉 Correct' : '❌ Nope'; };
+  });
+
+  // 31. Letter Rain (type to clear)
+  addGame('game31','Letter Rain','Type the letters.', (stage)=>{
+    setHUD('Typing');
+    const arena=el('div','arena'); stage.append(arena); const letters='asdfjklgh';
+    function spawn(){ const l=choice(letters.split('')); const d=el('div','dot',l); d.style.left=rand(0,arena.clientWidth-26)+'px'; d.style.top='0px'; arena.append(d); let y=0; function fall(){ y+=1.5; d.style.top=y+'px'; if(y>arena.clientHeight){ d.remove(); } else requestAnimationFrame(fall); } fall(); }
+    for(let i=0;i<50;i++) setTimeout(spawn, i*300);
+    addEventListener('keydown',e=>{ const match=[...arena.querySelectorAll('.dot')].find(n=>n.textContent===e.key); if(match){ match.remove(); } });
+  });
+
+  // 32. Don\'t Move
+  addGame('game32','Don\'t Move','Any key = lose.', (stage)=>{
+    setHUD('Zen 10s');
+    stage.append(el('div','center','<div class="big">Do nothing for 10 seconds…</div>'));
+    const fail=()=>{ stage.innerHTML='<div class="center" style="width:100%"><div class="big">You moved. 💥</div></div>'; window.onkeydown=window.onmousemove=null; };
+    window.onkeydown=fail; window.onmousemove=fail; setTimeout(()=>{ stage.innerHTML='<div class="center" style="width:100%"><div class="big">🏆 You did nothing!</div></div>'; window.onkeydown=window.onmousemove=null; },10000);
+  });
+
+  // 33. Button Mashing
+  addGame('game33','Mash X','Press X 60 times.', (stage)=>{
+    setHUD('Keyboard');
+    let c=0; const out=el('div','big','Press X: 0/60'); stage.append(el('div','center','')); stage.firstChild.append(out);
+    addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='x'){ c++; out.textContent='Press X: '+c+'/60'; if(c>=60){ out.textContent='🏆 Done'; } } });
+  });
+
+  // 34. 2048-ish Slide (single merge)
+  addGame('game34','Tiny Slide','Combine tiles once.', (stage)=>{
+    setHUD('Arrows');
+    const grid=el('div',''); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(4,64px)'; grid.style.gap='8px';
+    const cells=[]; for(let i=0;i<16;i++){ const c=el('div','pill mono',''); c.style.height='64px'; c.style.display='grid'; c.style.placeItems='center'; c.textContent=Math.random()<0.2?2:''; cells.push(c); grid.append(c);} stage.append(el('div','center','')); stage.firstChild.append(grid);
+    const get=(x,y)=>cells[y*4+x];
+    onkeydown=(e)=>{ const dirs={ArrowLeft:[1,0,-1,0],ArrowRight:[-1,0,1,0],ArrowUp:[0,1,0,-1],ArrowDown:[0,-1,0,1]}; const d=dirs[e.key]; if(!d) return; for(let k=0;k<4;k++){ for(let i=0;i<4;i++){ for(let j=0;j<4;j++){ const x=d[0]===1?1+i: d[0]===-1?2-i:i; const y=d[1]===1?1+j: d[1]===-1?2-j:j; const a=get(x,y), b=get(x-d[0],y-d[1]); if(a.textContent && (!b.textContent || b.textContent===a.textContent)){ b.textContent = (b.textContent? Number(b.textContent)*2 : Number(a.textContent)).toString(); a.textContent=''; } } } }
+    };
+  });
+
+  // 35. Quick Shapes (click the shown shape)
+  addGame('game35','Quick Shapes','Click matching shape.', (stage)=>{
+    setHUD('Perception');
+    const shapes=['square','circle','triangle']; const arena=el('div','arena'); stage.append(arena);
+    function place(){ arena.innerHTML=''; const target=choice(shapes); $('#hud').append(el('div','badge','Find: '+target));
+      for(let i=0;i<9;i++){ const t=choice(shapes); const d=el('div','', ''); d.style.position='absolute'; d.style.left=rand(10,arena.clientWidth-60)+'px'; d.style.top=rand(10,arena.clientHeight-60)+'px'; d.style.width=d.style.height='40px'; d.style.background='#2b2c3c'; if(t==='circle') d.style.borderRadius='50%'; if(t==='triangle'){ d.style.width='0'; d.style.height='0'; d.style.borderLeft='20px solid transparent'; d.style.borderRight='20px solid transparent'; d.style.borderBottom='40px solid #2b2c3c'; }
+        d.onclick=()=>{ if(t===target){ arena.innerHTML='<div class="center" style="width:100%"><div class="big">✅ Correct</div></div>'; } else arena.classList.add('shake'); setTimeout(()=>arena.classList.remove('shake'),200); };
+        arena.append(d); }
+    } place();
+  });
+
+  // 36. Balance Bar (keep centered)
+  addGame('game36','Balance Bar','A/D to center line.', (stage)=>{
+    setHUD('Control');
+    const bar=el('div','progress'); const fill=el('div'); bar.append(fill); stage.append(el('div','center','')); stage.firstChild.append(bar);
+    let x=50; addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='a') x-=2; if(e.key.toLowerCase()==='d') x+=2; x=clamp(x,0,100); fill.style.width=x+'%'; });
+    setInterval(()=>{ x+=rand(-1.8,1.8); x=clamp(x,0,100); fill.style.width=x+'%'; },120);
+  });
+
+  // 37. Typo Hunter (find typo)
+  addGame('game37','Typo Hunter','Spot the wrong word.', (stage)=>{
+    setHUD('Attention');
+    const words=['banana','potato','tomato','avocado','brocolli','lettuce','cabbage']; // intentional typo
+    const row=el('div','row'); words.forEach(w=>{ const b=el('button','btn',w); b.onclick=()=>{ if(w==='brocolli') row.insertAdjacentHTML('afterend','<div class="big">🕵️ Correct!</div>'); else row.insertAdjacentHTML('afterend','<div class="big">❌</div>'); }; row.append(b); });
+    stage.append(el('div','center','')); stage.firstChild.append(row);
+  });
+
+  // 38. Quick Click (10 random buttons)
+  addGame('game38','Quick Click','Click buttons as they appear.', (stage)=>{
+    setHUD('Reflex');
+    const arena=el('div','arena'); stage.append(arena); let n=0; const start=Date.now();
+    function spawn(){ const b=el('button','btn','Click'); b.style.position='absolute'; b.style.left=rand(0,arena.clientWidth-120)+'px'; b.style.top=rand(0,arena.clientHeight-40)+'px'; arena.append(b); b.onclick=()=>{ b.remove(); n++; if(n>=10){ const t=((Date.now()-start)/1000).toFixed(2); arena.innerHTML='<div class="center" style="width:100%"><div class="big">'+t+'s</div></div>'; } else setTimeout(spawn,200); } }
+    spawn();
+  });
+
+  // 39. Maze Dummy (random walk)
+  addGame('game39','Random Walk','Watch dot wander.', (stage)=>{
+    setHUD('Idle');
+    const arena=el('div','arena'); stage.append(arena); const d=el('div','dot'); arena.append(d); let x=100,y=100;
+    function step(){ x=clamp(x+rand(-6,6),0,arena.clientWidth-26); y=clamp(y+rand(-6,6),0,arena.clientHeight-26); d.style.left=x+'px'; d.style.top=y+'px'; requestAnimationFrame(step);} step();
+  });
+
+  // 40. Pong Wall (single paddle)
+  addGame('game40','Pong Wall','Keep ball alive.', (stage)=>{
+    setHUD('Mouse');
+    const arena=el('div','arena'); stage.append(arena); const pad=el('div','', ''); pad.style.position='absolute'; pad.style.width='14px'; pad.style.height='90px'; pad.style.left='10px'; pad.style.top='160px'; pad.style.background='#3a3b4a';
+    const ball=el('div','dot'); ball.style.left='120px'; ball.style.top='120px'; arena.append(pad,ball);
+    arena.onmousemove=(e)=>{ const r=arena.getBoundingClientRect(); pad.style.top=clamp(e.clientY-r.top-45,0,arena.clientHeight-90)+'px'; };
+    let x=120,y=120,vx=3,vy=2.5; function loop(){ x+=vx; y+=vy; if(y<0||y>arena.clientHeight-26) vy*=-1; if(x>arena.clientWidth-26) vx*=-1; const br=ball.getBoundingClientRect(), pr=pad.getBoundingClientRect(); if(!(br.right<pr.left||br.left>pr.right||br.bottom<pr.top||br.top>pr.bottom)){ vx=Math.abs(vx); }
+      if(x<0){ arena.innerHTML='<div class="center" style="width:100%"><div class="big">💥 Miss</div></div>'; return; } ball.style.left=x+'px'; ball.style.top=y+'px'; requestAnimationFrame(loop);} loop();
+  });
+
+  // 41. Typing Bomb (defuse word)
+  addGame('game41','Typing Bomb','Type word before 5s.', (stage)=>{
+    setHUD('Timer');
+    const word=choice(['matrix','cheese','pickle','vector','engine']); const q=el('div','big mono',word); const input=el('input','input'); const out=el('div','pill');
+    let time=5; const timer=el('div','badge','5s'); $('#hud').append(timer); const t=setInterval(()=>{ time--; timer.textContent=time+'s'; if(time<=0){ clearInterval(t); out.textContent='💥 Boom'; } },1000);
+    const btn=el('button','btn','Defuse'); stage.append(el('div','center','')); stage.firstChild.append(q,input,btn,out);
+    btn.onclick=()=>{ if(input.value.trim()===word){ clearInterval(t); out.textContent='✅ Safe'; } else out.textContent='❌ Wrong'; };
+  });
+
+  // 42. Snake Lite (grow 10)
+  addGame('game42','Snake Lite','Arrow keys to eat.', (stage)=>{
+    setHUD('Arrows');
+    const arena=el('div','arena'); stage.append(arena);
+    let body=[[10,10]], dir=[1,0], food=[15,10]; const size=20;
+    function draw(){ arena.innerHTML=''; const f=el('div','', ''); f.style.position='absolute'; f.style.width=f.style.height=size+'px'; f.style.left=food[0]*size+'px'; f.style.top=food[1]*size+'px'; f.style.background='#88ff55'; arena.append(f); body.forEach(([x,y])=>{ const b=el('div','', ''); b.style.position='absolute'; b.style.width=b.style.height=size+'px'; b.style.left=x*size+'px'; b.style.top=y*size+'px'; b.style.background='#55aaff'; arena.append(b); }); }
+    onkeydown=(e)=>{ const k=e.key; if(k==='ArrowLeft') dir=[-1,0]; if(k==='ArrowRight') dir=[1,0]; if(k==='ArrowUp') dir=[0,-1]; if(k==='ArrowDown') dir=[0,1]; };
+    function step(){ const head=[body[0][0]+dir[0], body[0][1]+dir[1]]; body.unshift(head); if(head[0]===food[0]&&head[1]===food[1]) food=[Math.floor(rand(0, arena.clientWidth/size)), Math.floor(rand(0, arena.clientHeight/size))]; else body.pop(); if(head[0]<0||head[1]<0||head[0]>Math.floor(arena.clientWidth/size)||head[1]>Math.floor(arena.clientHeight/size)||body.slice(1).some(p=>p[0]===head[0]&&p[1]===head[1])) return arena.innerHTML='<div class="center" style="width:100%"><div class="big">💥</div></div>'; draw(); requestAnimationFrame(step); } draw(); step();
+  });
+
+  // 43. Emoji Slot Machine
+  addGame('game43','Emoji Slots','Roll three, match = win.', (stage)=>{
+    setHUD('RNG');
+    const syms=['🍒','🍋','🍉','⭐','🔔','💎']; const row=el('div','row'); const reels=[el('div','pill big','-'),el('div','pill big','-'),el('div','pill big','-')]; reels.forEach(r=>row.append(r)); const btn=el('button','btn','Spin');
+    stage.append(el('div','center','')); stage.firstChild.append(row,btn);
+    btn.onclick=()=>{ let c=0; const t=setInterval(()=>{ reels.forEach(r=>r.textContent=choice(syms)); if(++c>15){ clearInterval(t); const v=reels.map(r=>r.textContent); if(new Set(v).size===1) stage.firstChild.append(el('div','big','🏆 JACKPOT')); } },100);
+    };
+  });
+
+  // 44. Red Button (don\'t press)
+  addGame('game44','Don\'t Press','Whatever you do…', (stage)=>{
+    setHUD('Psych');
+    const b=el('button','btn','DO NOT PRESS'); b.style.background='#ff3b3b';
+    stage.append(el('div','center','')); stage.firstChild.append(b);
+    b.onclick=()=>{ b.disabled=true; stage.firstChild.append(el('div','big','…you pressed it. 😑')); };
+  });
+
+  // 45. Pattern Memory (lights)
+  addGame('game45','Lights','Repeat the pattern.', (stage)=>{
+    setHUD('Memory');
+    const pads=[el('button','btn','A'),el('button','btn','B'),el('button','btn','C'),el('button','btn','D')];
+    const row=el('div','row'); pads.forEach(p=>row.append(p)); const seq=[]; const your=[]; const out=el('div','pill');
+    stage.append(el('div','center','')); stage.firstChild.append(row,out);
+    function flash(i){ pads[i].style.transform='scale(1.1)'; setTimeout(()=>pads[i].style.transform='scale(1)',200); }
+    function next(){ seq.push(Math.floor(rand(0,4))); let i=0; const t=setInterval(()=>{ flash(seq[i++]); if(i>=seq.length){ clearInterval(t); your.length=0; out.textContent='Your turn'; } },400); }
+    pads.forEach((p,i)=>p.onclick=()=>{ your.push(i); flash(i); if(your[your.length-1]!==seq[your.length-1]){ out.textContent='❌'; } else if(your.length===seq.length){ out.textContent='✅'; setTimeout(next,600); } });
+    next();
+  });
+
+  // 46. Find the Different Color
+  addGame('game46','Odd Color','Click the odd tile.', (stage)=>{
+    setHUD('Perception');
+    const grid=el('div',''); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(6,40px)'; grid.style.gap='8px';
+    const base=[Math.floor(rand(50,200)),Math.floor(rand(50,200)),Math.floor(rand(50,200))];
+    const odd=Math.floor(rand(0,36));
+    for(let i=0;i<36;i++){ const b=el('div','', ''); b.style.width=b.style.height='40px'; const c=base.map((v,j)=> clamp(v + (i===odd? 20:0),0,255)); b.style.background=`rgb(${c[0]},${c[1]},${c[2]})`; b.onclick=()=>{ grid.insertAdjacentHTML('afterend','<div class="big">'+(i===odd?'✅ Correct':'❌ Nope')+'</div>'); }; grid.append(b); }
+    stage.append(el('div','center','')); stage.firstChild.append(grid);
+  });
+
+  // 47. Target Practice (moving)
+  addGame('game47','Moving Target','Click the moving target.', (stage)=>{
+    setHUD('Aim');
+    const arena=el('div','arena'); stage.append(arena); const t=el('div','dot target'); arena.append(t); let x=100,y=100;
+    function loop(){ x+=Math.sin(Date.now()/300)*1.5; y+=Math.cos(Date.now()/400)*1.5; t.style.left=clamp(x,0,arena.clientWidth-26)+'px'; t.style.top=clamp(y,0,arena.clientHeight-26)+'px'; requestAnimationFrame(loop);} loop();
+    t.onclick=()=>{ arena.innerHTML='<div class="center" style="width:100%"><div class="big">🎯</div></div>'; };
+  });
+
+  // 48. Speed Reader
+  addGame('game48','Speed Reader','Words flash quickly.', (stage)=>{
+    setHUD('Focus');
+    const input=el('textarea','input'); input.style.height='120px'; input.placeholder='Paste some text…'; const btn=el('button','btn','Start'); const wpm=el('div','badge','400 wpm'); $('#hud').append(wpm);
+    const box=el('div','big mono',''); stage.append(el('div','center','')); stage.firstChild.append(input,btn,box);
+    btn.onclick=()=>{ const words=input.value.split(/\s+/).filter(Boolean); let i=0; const t=setInterval(()=>{ box.textContent=words[i++]; if(i>=words.length) clearInterval(t); }, 150); };
+  });
+
+  // 49. Cookie Clicker-ish (tiny)
+  addGame('game49','Tiny Cookie','Click to grow score.', (stage)=>{
+    setHUD('Idle Clicker');
+    let s=0; const btn=el('button','btn','🍪 +1'); const out=el('div','pill mono','0'); const up=el('button','btn secondary','Upgrade (10)'); let mult=1;
+    btn.onclick=()=>{ s+=mult; out.textContent=s; };
+    up.onclick=()=>{ if(s>=10){ s-=10; mult++; out.textContent=s; up.textContent='Upgrade ('+(10*mult)+')'; } };
+    stage.append(el('div','center','')); stage.firstChild.append(btn,out,up);
+  });
+
+  // 50. Chaos Button (random game)
+  addGame('game50','Chaos Button','Loads a random game.', (stage)=>{
+    setHUD('Meta');
+    stage.append(el('div','center','<div class="big">Press the chaos button</div>'));
+    const btn=el('button','btn','🎲 Chaos'); stage.firstChild.append(btn);
+    btn.onclick=()=>{ loadGame(choice(games).id); };
+  });
+
+  // ---------- Menu + Router ----------
+  const menuEl = $('#menu');
+  function renderMenu(){
+    menuEl.innerHTML='';
+    games.forEach(g=>{
+      const t = el('div','card tile');
+      t.innerHTML = `<h3>${g.name}</h3><p>${g.desc}</p>`;
+      t.onclick=()=>{ loadGame(g.id); };
+      menuEl.appendChild(t);
+    });
+  }
+
+  function loadGame(id){
+    const g = games.find(x=>x.id===id); if(!g) return;
+    window.location.hash = id;
+    const sc = clearStage();
+    g.init(sc);
+  }
+
+  function route(){ const id = location.hash.replace('#',''); if(id){ loadGame(id); } else { backToMenu(); renderMenu(); } }
+  window.addEventListener('hashchange', route);
+  $('#backBtn').onclick=()=>{ window.location.hash=''; };
+  $('#randomBtn').onclick=()=>{ const r = choice(games); loadGame(r.id); };
+
+  renderMenu();
+  route();
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') window.location.hash=''; });
+  </script>
 </body>
 </html>
-
