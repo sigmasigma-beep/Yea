@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snack Randomizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #ff7675;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: 0.2s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background-color: #d63031;
+    }
+    #snack {
+      margin-top: 30px;
+      font-size: 1.5em;
+      font-weight: bold;
+      min-height: 2em;
+    }
+    .rolling {
+      animation: roll 0.8s ease-in-out infinite;
+    }
+    @keyframes roll {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(10deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-10deg); }
+      100% { transform: rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Snack Randomizer 🍿</h1>
+  <button onclick="randomSnack()">Give me a snack!</button>
+  <div id="snack"></div>
+
+  <script>
+    const snacks = [
+      "Chips and salsa", "Peanut butter on a spoon", "Grilled cheese sandwich", "Instant ramen", "Cheese cubes", "Nutella on bread", "Oreos dipped in milk", "Popcorn", "Pickles", "Leftover pizza", "Fruit salad", "Chocolate bar", "Cereal (no matter the time of day)", "Ice cream straight from the tub", "Hot pockets", "Nachos", "Energy drink and regret",
+      "Trail mix", "Banana with peanut butter", "Avocado toast", "French fries", "Onion rings", "Donuts", "Bagel with cream cheese", "Hummus and pita", "Granola bar", "Smoothie", "Rice cakes", "Tortilla with cheese", "Beef jerky", "Cup noodles", "Taco", "Burrito", "Fried rice", "Sushi rolls", "Spring rolls", "Mozzarella sticks", "Quesadilla", "Soft pretzel", "Chocolate chip cookie", "Brownie", "Cupcake", "Muffin", "Croissant", "Apple slices", "Orange wedges", "Grapes", "Strawberries", "Blueberries", "Pineapple chunks", "Watermelon slices", "Cherries", "Kiwi", "Mango slices", "Peach", "Plum", "Carrot sticks", "Celery with peanut butter", "Cucumber slices", "Cherry tomatoes", "Salad bowl", "Yogurt parfait", "Cheese sticks", "Crackers", "Saltines", "Goldfish crackers", "Animal crackers", "Rice Krispies treat", "Marshmallows", "Pocky sticks", "Chocolate pudding", "Vanilla pudding", "Jello cup", "Mac and cheese", "Baked potato", "Mashed potatoes", "French toast sticks", "Waffles", "Pancakes", "Sausage links", "Bacon strips", "Chicken nuggets", "Chicken tenders", "Fried chicken", "Pizza rolls", "Bagel bites", "Corn dog", "Hot dog", "Burger slider", "Mini sandwiches", "Peanut butter and jelly", "Club sandwich", "BLT sandwich", "Ham and cheese", "Turkey wrap", "Veggie wrap", "Falafel balls", "Empanadas", "Samosas", "Dumplings", "Gyoza", "Ravioli", "Spaghetti leftovers", "Lasagna squares", "Garlic bread", "Breadsticks", "Cheese fondue", "Nacho cheese dip", "Buffalo wings", "Chili fries", "Tater tots", "Hash browns", "Egg rolls", "Shrimp cocktail", "Clam chowder cup", "Chips and queso", "Spinach dip", "Queso fundido"
+    ];
+
+    function randomSnack() {
+      const snackDiv = document.getElementById("snack");
+      snackDiv.classList.add("rolling");
+
+      let count = 0;
+      const interval = setInterval(() => {
+        const choice = snacks[Math.floor(Math.random() * snacks.length)];
+        snackDiv.textContent = "👉 " + choice;
+        count++;
+        if (count > 10) {
+          clearInterval(interval);
+          snackDiv.classList.remove("rolling");
+        }
+      }, 100);
+    }
+  </script>
+</body>
+</html>
